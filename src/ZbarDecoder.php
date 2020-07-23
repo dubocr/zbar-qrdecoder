@@ -47,10 +47,10 @@ class ZbarDecoder
      * @return AbstractResult|ResultCollection
      * @throws \Exception
      */
-    public function make($filename)
+    public function make($filename, $args = [])
     {
         $this->setFilePath($filename);
-        $this->buildProcess();
+        $this->buildProcess($args);
         $this->runProcess();
 
         return $this->output();
@@ -107,16 +107,17 @@ class ZbarDecoder
      *
      * @throws \Exception
      */
-    private function buildProcess()
+    private function buildProcess($args = [])
     {
         $path = $this->getPath();
-        $this->process = new Process([
+        $args = array_merge([
             $path . DIRECTORY_SEPARATOR . static::EXECUTABLE,
             '-D',
             '--xml',
-            '-q',
-            $this->getFilePath()
-        ]);
+            '-q'
+        ], $args);
+        $args[] = $this->getFilePath();
+        $this->process = new Process($args);
         $this->process->enableOutput();
 
     }
